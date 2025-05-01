@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        input {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Flask API Test</h1>
+
+    <!-- Test GET /hello -->
+    <button onclick="getHello()">Say Hello</button>
+    <p id="helloResult"></p>
+
+    <!-- Test POST /add -->
+    <h2>Add Two Numbers</h2>
+    <input type="number" id="numA" placeholder="Enter a">
+    <input type="number" id="numB" placeholder="Enter b">
+    <button onclick="postAdd()">Add</button>
+    <p id="addResult"></p>
+
+    <script>
+        function getHello() {
+            fetch('/hello')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('helloResult').innerText = data.message;
+                })
+                .catch(error => {
+                    document.getElementById('helloResult').innerText = 'Error: ' + error;
+                });
+        }
+
+        function postAdd() {
+            const a = parseFloat(document.getElementById('numA').value);
+            const b = parseFloat(document.getElementById('numB').value);
+
+            fetch('/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ a: a, b: b })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('addResult').innerText = 'Result: ' + data.result;
+            })
+            .catch(error => {
+                document.getElementById('addResult').innerText = 'Error: ' + error;
+            });
+        }
+    </script>
+
+</body>
+</html>
