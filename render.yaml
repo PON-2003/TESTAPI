@@ -11,9 +11,12 @@ services:
     buildFilter:
       paths:
         - APIBroo.py
-        - index.html
+        - render.yaml
+        - requirements.txt
+        - .gitignore
     autoDeploy: true
 
 build:
   commands:
-    - pip install -r requirements.txt
+    - pip install --upgrade pip  # อัพเกรด pip ให้เป็นเวอร์ชันล่าสุด
+    - pip install -r requirements.txt  # ติดตั้ง dependencies จาก requirements.txt
