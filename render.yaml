@@ -5,7 +5,7 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
     env: python
-    region: oregon  # หรือ singapore, frankfurt, ฯลฯ
+    region: singapore  # หรือ singapore, frankfurt, ฯลฯ
     plan: free
     branch: main
     buildFilter:
