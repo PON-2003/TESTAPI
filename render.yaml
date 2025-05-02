@@ -3,14 +3,17 @@ services:
     name: trash-classifier-api
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn APIBroo:app
     env: python
-    region: singapore  # หรือ singapore, frankfurt, ฯลฯ
+    region: singapore
     plan: free
     branch: main
     buildFilter:
       paths:
         - APIBroo.py
-        - model/trash_classifier_model.h5
-        - templates/index.html
+        - index.html
     autoDeploy: true
+
+build:
+  commands:
+    - pip install -r requirements.txt

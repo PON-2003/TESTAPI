@@ -1,0 +1,26 @@
+# Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+
+# TensorFlow model file (ถ้าคุณไม่ต้องการอัพโหลดไฟล์ .h5 ไปยัง git)
+trash_classifier_model.h5
+
+# Logs
+*.log
+
+# Flask instance folder
+instance/
+
+# IDE files (เช่น PyCharm, VSCode)
+.idea/
+.vscode/
+
+# Operating system files (macOS, Windows)
+.DS_Store
+Thumbs.db

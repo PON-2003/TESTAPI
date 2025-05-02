@@ -2,11 +2,12 @@ import cv2
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from io import BytesIO
 from PIL import Image
 import base64
 import requests
+import threading
 
 # ฟังก์ชันสำหรับดาวน์โหลดไฟล์จาก Google Drive
 def download_file_from_google_drive(file_id, destination):
@@ -25,7 +26,7 @@ def download_file_from_google_drive(file_id, destination):
         print("Failed to download file")
         raise Exception("Download failed")
 
-# โหลดโมเดลจากไฟล์ .h5 (ก่อนทำการทำนาย)
+# โหลดโมเดลจากไฟล์ .h5
 def load_trash_classifier_model():
     # ลิงก์ไฟล์ Google Drive (id ของไฟล์ .h5)
     file_id = '1tyqKB1ZUIOctQASkU-d8KVccrs9Wc_wj'  # เปลี่ยนเป็น ID ของไฟล์ .h5 ของคุณ
@@ -69,6 +70,11 @@ def draw_bounding_box(img):
     # วาดกรอบ
     cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)  # วาดกรอบสีเขียว
     return img, (x1, y1, x2, y2)
+
+# หน้าหลักที่แสดง HTML
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 # API สำหรับทำนายภาพที่ได้รับจากกล้อง
 @app.route('/predict', methods=['POST'])
@@ -130,9 +136,11 @@ def capture_image_from_camera():
     cap.release()
     cv2.destroyAllWindows()
 
+# รัน Flask และการจับภาพจากกล้องในกระบวนการแยก
 if __name__ == '__main__':
-    # เริ่มต้นการจับภาพจากกล้อง
-    capture_image_from_camera()
+    # เริ่มต้นการจับภาพจากกล้องในกระบวนการแยก
+    camera_thread = threading.Thread(target=capture_image_from_camera)
+    camera_thread.start()
     
     # เริ่มแอป Flask
-    # app.run(debug=True)  # ใช้แค่ในการรัน Flask API, ถ้าคุณต้องการรันในโหมด production ควรใช้ app.run(host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port=5000)
