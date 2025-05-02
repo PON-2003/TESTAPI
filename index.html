@@ -2,63 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Flask API Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trash Classifier</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
+        #videoElement {
+            width: 100%;
+            height: auto;
         }
-        input {
-            margin: 5px;
+        #predictionResult {
+            margin-top: 20px;
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
 
-    <h1>Flask API Test</h1>
+    <h1>Trash Classifier - Real-time Prediction</h1>
 
-    <!-- Test GET /hello -->
-    <button onclick="getHello()">Say Hello</button>
-    <p id="helloResult"></p>
+    <!-- Video feed -->
+    <video id="videoElement" autoplay></video>
+    
+    <button id="captureButton">Capture Image</button>
 
-    <!-- Test POST /add -->
-    <h2>Add Two Numbers</h2>
-    <input type="number" id="numA" placeholder="Enter a">
-    <input type="number" id="numB" placeholder="Enter b">
-    <button onclick="postAdd()">Add</button>
-    <p id="addResult"></p>
+    <div id="predictionResult"></div>
 
     <script>
-        function getHello() {
-            fetch('/hello')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('helloResult').innerText = data.message;
-                })
-                .catch(error => {
-                    document.getElementById('helloResult').innerText = 'Error: ' + error;
-                });
-        }
+        const video = document.getElementById('videoElement');
+        const captureButton = document.getElementById('captureButton');
+        const predictionResult = document.getElementById('predictionResult');
+        
+        // เริ่มต้นการเปิดกล้อง
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                video.srcObject = stream;
+            })
+            .catch(function(error) {
+                console.error('Error accessing webcam: ', error);
+            });
 
-        function postAdd() {
-            const a = parseFloat(document.getElementById('numA').value);
-            const b = parseFloat(document.getElementById('numB').value);
+        // ฟังก์ชันจับภาพจากกล้อง
+        captureButton.addEventListener('click', function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            fetch('/add', {
+            const imageData = canvas.toDataURL('image/jpeg');  // แปลงเป็น base64
+
+            // ส่งข้อมูลไปที่ API
+            fetch('/predict', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ a: a, b: b })
+                body: JSON.stringify({
+                    image: imageData
+                }),
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('addResult').innerText = 'Result: ' + data.result;
+                if (data.error) {
+                    predictionResult.innerHTML = "Error: " + data.error;
+                } else {
+                    predictionResult.innerHTML = `Prediction: ${data.prediction}<br>Confidence: ${data.confidence.toFixed(2)}`;
+                }
             })
             .catch(error => {
-                document.getElementById('addResult').innerText = 'Error: ' + error;
+                predictionResult.innerHTML = 'Error: ' + error;
             });
-        }
+        });
     </script>
 
 </body>

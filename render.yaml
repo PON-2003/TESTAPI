@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: trash-classifier-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    env: python
+    region: oregon  # หรือ singapore, frankfurt, ฯลฯ
+    plan: free
+    branch: main
+    buildFilter:
+      paths:
+        - app.py
+        - model/trash_classifier_model.h5
+        - templates/index.html
+    autoDeploy: true
